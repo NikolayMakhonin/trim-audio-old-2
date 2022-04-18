@@ -7,12 +7,16 @@ describe('node > trim', function () {
 
 	it('base', async function () {
 		await trimAudioFile({
-			inputFilePath : path.join(__dirname, 'assets/test.ogg'),
-			outputFilePath: './tmp/test/base.mp3',
+			inputFilePath : path.join(__dirname, 'assets-test/test.ogg'),
+			outputFilePath: './tmp/test/test.mp3',
+		})
+		await trimAudioFile({
+			inputFilePath : path.join(__dirname, 'assets-test/test2.ogg'),
+			outputFilePath: './tmp/test/test2.mp3',
 		})
 	})
 
-	it('bulk', async function () {
+	xit('bulk', async function () {
 		await trimAudioFilesFromDir({
 			inputDir               : 'l:/Work/_GIT/GitHub/NodeJs/apps/counter-sapper/docs/materials/speech/ogg',
 			inputFilesRelativeGlobs: ['**/*.ogg'],

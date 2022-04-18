@@ -12,7 +12,7 @@
     "dev:watch": "nodemon --delay 0.3 --exec \"ts-node -r tsconfig-paths/register --project tsconfig.dev.json \" --signal SIGTERM --watch ./src -e ts,js ./src/cli.ts",
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
-    "build": "rimraf dist && rollup -c && cpy \"**/assets/**\" \"../dist/\" --parents --cwd=src",
+    "build": "rimraf dist && rollup -c && cpy \"**/assets*/**\" \"../dist/\" --parents --cwd=src",
     "start": "node ./dist/cli.js",
     "coverage-check": "nyc check-coverage --report-dir tmp/coverage/lcov --lines 0.1 --functions 0.1 --branches 0 --statements 0.1",
     "test": "mocha ./src/**/*.test.ts",
