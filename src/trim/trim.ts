@@ -1,4 +1,4 @@
-import globby from 'globby'
+import {globby} from 'globby'
 import fse from 'fs-extra'
 import path from 'path'
 import prism from 'prism-media'
