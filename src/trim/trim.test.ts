@@ -7,11 +7,11 @@ describe('node > trim', function () {
 
 	it('base', async function () {
 		await trimAudioFile({
-			inputFilePath : path.join(__dirname, 'assets-test/test.ogg'),
+			inputFilePath : 'src/trim/assets-test/music.mp3',
 			outputFilePath: './tmp/test/test.mp3',
 		})
 		await trimAudioFile({
-			inputFilePath : path.join(__dirname, 'assets-test/test2.ogg'),
+			inputFilePath : 'src/trim/assets-test/test2.ogg',
 			outputFilePath: './tmp/test/test2.mp3',
 		})
 	})

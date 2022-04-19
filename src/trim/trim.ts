@@ -9,6 +9,11 @@ import BufferListStream from 'bl'
 import BufferList from 'bl/BufferList'
 import MultiStream from 'multistream'
 import {Duplex, Transform} from 'stream'
+import CodecParser from 'codec-parser'
+import { OpusDecoderWebWorker } from 'opus-decoder'
+import { MPEGDecoderWebWorker } from 'mpg123-decoder'
+// import ogv from 'ogv/dist/ogv-decoder-audio-vorbis-wasm'
+import { createMp3Encoder, createOggEncoder } from 'wasm-media-encoders'
 
 const SILENCE_LEVEL_START_DEFAULT = -1.1 // use -1.5 for 'ф..'
 const SILENCE_LEVEL_END_DEFAULT = -2
@@ -30,15 +35,14 @@ export function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 
 export async function readOgg(stream: ReadStream): Promise<Int16Array> {
   const replayBuffers = new BufferList()
-
-  const transform = new Transform({
-    // writableObjectMode: true,
-    transform(chunk, encoding, callback) {
-      replayBuffers.append(chunk)
-      callback(null, chunk)
-    },
-  })
-  transform.
+  //
+  // const transform = new Transform({
+  //   writableObjectMode: true,
+  //   transform(chunk, encoding, callback) {
+  //     replayBuffers.append(chunk)
+  //     callback(null, chunk)
+  //   },
+  // })
 
   // const metadata = await musicMetadata.parseStream(stream.pipe(transform), {
   //   path: 'music.ogg',
@@ -49,28 +53,108 @@ export async function readOgg(stream: ReadStream): Promise<Int16Array> {
   //   skipPostHeaders: true,
   // })
 
-  stream.pipe(transform)
+  // stream.pipe(transform)
+  //
+  // await new Promise((resolve) => {
+  //   transform.once('data', (chunk) => {
+  //     // console.log('data', chunk)
+  //     resolve(null)
+  //   })
+  //   transform.read(1)
+  // })
+  //
+  // stream.unpipe(transform)
+  // transform.end()
+  //
+  // const replayStream = new BufferListStream(replayBuffers)
+  //
+  // stream.resume()
 
-  await new Promise((resolve) => {
-    transform.once('data', (chunk) => {
-      console.log('data', chunk)
-      resolve(null)
-    })
-    transform.read(1)
+  // const _ogv = ogv
+  // console.log(_ogv)
+
+  // const parser = new CodecParser('audio/ogg', {})
+  // const wasmDecoder = new OpusDecoderWebWorker()
+
+  const parser = new CodecParser('audio/mpeg', {})
+  const wasmDecoder = new MPEGDecoderWebWorker()
+
+  const allFrames = []
+
+  const decode = new Transform({
+    writableObjectMode: true,
+    transform(chunk, encoding, callback) {
+      try {
+        for (const chunkParsed of parser.parseChunk(new Uint8Array(chunk))) {
+          if (chunkParsed.codecFrames) {
+            for (let i = 0, len = chunkParsed.codecFrames.length; i < len; i++) {
+              const frame = chunkParsed.codecFrames[i]
+              allFrames.push(frame.data)
+              this.push(frame.data)
+            }
+          } else {
+            allFrames.push(chunkParsed.data)
+            this.push(chunkParsed.data)
+          }
+        }
+        callback()
+      } catch (err) {
+        callback(err)
+      }
+    },
   })
 
-  stream.unpipe(transform)
+  const convert = new Transform({
+    writableObjectMode: true,
+    async transform(chunk, encoding, callback) {
+      try {
+        const { channelData, samplesDecoded, sampleRate } =
+          await wasmDecoder.decodeFrames(chunk)
+        callback(null, chunk)
+      } catch (err) {
+        callback(err)
+      }
+    },
+  })
 
-  const replayStream = new BufferListStream(replayBuffers)
+  // const { channelData, samplesDecoded, sampleRate } =
+  //   await this._wasmDecoder.decodeFrames(frames.map((f) => f.data));
 
-  const resultStream = new MultiStream([replayStream, stream])
-    .pipe(new prism.opus.OggDemuxer())
+  const buf = await streamToBuffer(stream.pipe(decode))
+
+  const { channelData, samplesDecoded, sampleRate } =
+    await wasmDecoder.decodeFrames(allFrames)
+
+  const encoder = await createMp3Encoder()
+  encoder.configure({
+    bitrate : 128,
+    channels: channelData.length > 1 ? 2 : 1,
+    sampleRate,
+  })
+  const result = encoder.encode(channelData)
+
+  await fse.writeFile('./tmp/test/test.mp3', result)
+
+  // const buf = await streamToBuffer(new MultiStream([replayStream, stream]))
+
+  // const result = parser.parseAll(buf)
+  // const result = [...parser.parseChunk(stream)]
+
+  const resultStream =
+    // new MultiStream([replayStream, stream], {
+    //   objectMode: true,
+    // })
+  stream
+    .pipe(new prism.opus.WebmDemuxer())
     .pipe(new prism.opus.Decoder(
       {
-        rate     : 16000,
+        rate     : 44100,
         channels : 1,
         frameSize: 960,
-      },
+        // rate     : 16000,
+        // channels : 1,
+        // frameSize: 960,
+      } as any,
     ))
 
   const buffer = await streamToBuffer(resultStream)
