@@ -60,10 +60,10 @@ function getFirstMaximum({
       const avg = sum / windowSize
       if (i === windowSize - 1 || avg > prevAvg) {
         prevAvg = avg
-      } else if (avg === prevAvg) {
         maximumStart = i
       } else if (avg < prevAvg) {
-        maximumEnd = i
+        maximumEnd = i - 1
+        break
       }
     }
   }
@@ -95,18 +95,19 @@ export function checkSamples({
   const sampleRate = samples.sampleRate
   const checkFirstMaximum = getFirstMaximum({
     samplesCount,
-    windowSize: Math.round(0.001 * sampleRate),
+    windowSize: Math.round(0.1 * sampleRate),
     getSample : o => checkAudioFunc(o / sampleRate, 0),
   })
   const firstMaximum = getFirstMaximum({
     samplesCount,
-    windowSize: Math.round(0.001 * sampleRate),
+    windowSize: Math.round(0.1 * sampleRate),
     getSample : o => samples.channelsData[0][o],
   })
   const startSample = firstMaximum - checkFirstMaximum
+  const startTime = startSample / sampleRate
 
-  assert.ok(firstMaximum >= checkFirstMaximum - Math.round(0.05 * sampleRate), firstMaximum + '')
-  assert.ok(firstMaximum <= checkFirstMaximum - Math.round(0.1 * sampleRate), firstMaximum + '')
+  assert.ok(startTime >= -0.005, startTime + '')
+  assert.ok(startTime <= 0.1, startTime + '')
 
   const totalDuration = (samplesCount - startSample) / samples.sampleRate
   assert.ok(totalDuration >= checkAudioDurationSec - 0.05, totalDuration + '')
@@ -125,7 +126,7 @@ export function checkSamples({
     }
 
     const avgError = sumError / samplesCount
-    assert.ok(avgError < 0.1, avgError + '')
+    assert.ok(avgError < 0.05, avgError + '')
   }
 }
 
