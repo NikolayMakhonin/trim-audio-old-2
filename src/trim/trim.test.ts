@@ -2,7 +2,7 @@
 import path from 'path'
 import {trimAudioFile, trimAudioFiles, trimAudioFilesFromDir} from './trim'
 
-describe('node > trim', function () {
+xdescribe('node > trim', function () {
 	this.timeout(60000000)
 
 	it('base', async function () {

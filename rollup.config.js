@@ -57,7 +57,7 @@ const aliasOptions = {
 const serverConfig = {
   cache: true,
   input: [
-    'src/**/*.ts',
+    'src/**/*.ts'
   ],
   output: {
     dir: 'dist',

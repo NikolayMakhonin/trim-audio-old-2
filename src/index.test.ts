@@ -1,4 +1,4 @@
-import {test1} from 'src/index'
+import {test1} from './index'
 
 describe(
   'test', function () {

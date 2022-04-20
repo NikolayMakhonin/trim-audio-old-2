@@ -4,7 +4,7 @@ module.exports = {
     'ts-node/register',
     './src/helpers/test/register.ts',
   ],
-  'watch-files': ['./src/**/*.ts'],
+  'watch-files': ['./src/**'],
   // 'loader': 'ts-node/esm',
   "node-option": ["experimental-specifier-resolution=node", "loader=ts-node/esm"],
 }
