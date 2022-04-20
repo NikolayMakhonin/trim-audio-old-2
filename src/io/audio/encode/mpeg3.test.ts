@@ -27,6 +27,8 @@ describe('io > audio > encode > mpeg3', function () {
 
     const stream = toReadable(data)
     const samples = await decodeMpeg123Stream(stream)
+    // const samples = originalSamples
+
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
