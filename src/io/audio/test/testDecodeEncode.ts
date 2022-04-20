@@ -1,7 +1,7 @@
 import path from 'path'
 import fse from 'fs-extra'
-import {AudioDecode} from '../decoders/contracts'
-import {AudioEncode} from '../encoders/contracts'
+import {AudioDecode} from '../decode/contracts'
+import {AudioEncode} from '../encode/contracts'
 import {AudioSamples} from '../contracts'
 import {fileURLToPath} from 'url'
 
