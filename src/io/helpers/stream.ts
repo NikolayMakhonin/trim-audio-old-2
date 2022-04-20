@@ -38,3 +38,12 @@ export function streamForEach(stream: Readable, callback: (chunk) => void): Prom
   })
 }
 
+// from: https://github.com/sindresorhus/to-readable-stream/blob/main/index.js
+export function toReadable(value) {
+  return new Readable({
+    read() {
+      this.push(value)
+      this.push(null)
+    },
+  })
+}

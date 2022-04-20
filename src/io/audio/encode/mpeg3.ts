@@ -10,6 +10,7 @@ export async function encodeMpeg3(samples: AudioSamples, options?: {
   const encoder = await createMp3Encoder()
   encoder.configure({
     bitrate   : options?.bitrate || 128,
+    // vbrQuality: 1,
     channels  : samples.channelsData.length > 1 ? 2 : 1,
     sampleRate: samples.sampleRate,
   })

@@ -36,6 +36,27 @@ export function testAudioFunc(time: number, channel: number): number {
   }
 }
 
+export function generateTestSamples({
+  audioFunc,
+  sampleRate,
+  durationSec,
+}: {
+  audioFunc: (time: number, channel: number) => number,
+  sampleRate: number,
+  durationSec: number,
+}) {
+  const samplesCount = durationSec * sampleRate
+  const samples: AudioSamples = {
+    channelsData: [new Float32Array(samplesCount), new Float32Array(samplesCount)],
+    sampleRate,
+  }
+  for (let i = 0; i < samplesCount; i++) {
+    samples.channelsData[0][i] = audioFunc(i / sampleRate, 0)
+    samples.channelsData[1][i] = audioFunc(i / sampleRate, 1)
+  }
+  return samples
+}
+
 function getFirstMaximum({
   getSample,
   windowSize,
@@ -143,6 +164,18 @@ export function createAssetStream(assetFileName: string) {
   const filePath = path.resolve(__dirname, 'assets', assetFileName)
   const stream = fse.createReadStream(filePath)
   return stream
+}
+
+export async function saveFile(fileName: string, data: any) {
+  const outputFilePath = path.resolve('./tmp/', path.relative('./src', path.resolve(__dirname, 'assets', fileName)))
+  if (fse.existsSync(outputFilePath)) {
+    await fse.unlink(outputFilePath)
+  }
+  const dir = path.dirname(outputFilePath)
+  if (!fse.existsSync(dir)) {
+    await fse.mkdirp(dir)
+  }
+  await fse.writeFile(outputFilePath, data)
 }
 
 // export async function testDecodeEncode<TOptions>({
