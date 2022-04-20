@@ -72,7 +72,10 @@ function getFirstMaximum({
     throw new Error('Cannot find first maximum')
   }
 
-  return Math.round((maximumEnd + maximumStart - windowSize) / 2)
+  return {
+    index: Math.round((maximumEnd + maximumStart - windowSize) / 2),
+    value: prevAvg,
+  }
 }
 
 export function checkSamples({
@@ -80,16 +83,14 @@ export function checkSamples({
   checkAudioFunc,
   checkAudioDurationSec,
   checkChannelCount,
-  amplitude,
 }: {
   samples: AudioSamples,
   checkAudioFunc: (time: number, channel: number) => number,
   checkAudioDurationSec: number,
   checkChannelCount: number,
-  amplitude: number,
 }) {
   const channelCount = samples.channelsData.length
-  assert.strictEqual(channelCount, checkChannelCount)
+  // assert.strictEqual(channelCount, checkChannelCount)
 
   const samplesCount = samples.channelsData[0].length
   const sampleRate = samples.sampleRate
@@ -103,11 +104,15 @@ export function checkSamples({
     windowSize: Math.round(0.1 * sampleRate),
     getSample : o => samples.channelsData[0][o],
   })
-  const startSample = firstMaximum - checkFirstMaximum
+  const startSample = firstMaximum.index - checkFirstMaximum.index
   const startTime = startSample / sampleRate
 
   assert.ok(startTime >= -0.005, startTime + '')
-  assert.ok(startTime <= 0.1, startTime + '')
+  assert.ok(startTime <= 0.2, startTime + '')
+
+  const amplitude = firstMaximum.value / checkFirstMaximum.value
+  assert.ok(amplitude >= 0.85, amplitude + '')
+  assert.ok(amplitude <= 1.05, amplitude + '')
 
   const totalDuration = (samplesCount - startSample) / samples.sampleRate
   assert.ok(totalDuration >= checkAudioDurationSec - 0.05, totalDuration + '')
@@ -120,7 +125,10 @@ export function checkSamples({
     let sumError = 0
     for (let i = startSample; i < samplesCount; i++) {
       const sample = channelData[i]
-      const checkSample = checkAudioFunc((i - startSample) / sampleRate, channel) * amplitude
+      const checkSample = checkAudioFunc(
+        (i - startSample) / sampleRate,
+        checkChannelCount > 1 ? channel : 0,
+      ) * amplitude
       const error = Math.abs(checkSample - sample)
       sumError += error * error
     }
