@@ -126,9 +126,9 @@ export async function encodeMpeg3(samples: AudioSamples, options?: {
     '-f', 'f32le',
     '-ar', samples.sampleRate + '',
     '-ac', samples.channelsData.length + '',
-    // '-codec:a', 'libmp3lame',
-    // options.bitrate ? '-b:a' : '-q:a', options.bitrate ? options.bitrate + 'k' : options.vbrQuality + '',
     '-i', 'input.pcm',
+    // '-codec:a', 'libmp3lame',
+    options.bitrate ? '-b:a' : '-q:a', options.bitrate ? options.bitrate + 'k' : options.vbrQuality + '',
     'output.mp3',
   )
 

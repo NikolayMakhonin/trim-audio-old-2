@@ -18,8 +18,8 @@ describe('io > audio > encode > mpeg3', function () {
       durationSec: 7,
     })
     const data = await encodeMpeg3(originalSamples, {
-      // bitrate: 8,
-      vbrQuality: 0,
+      bitrate: 8,
+      // vbrQuality: 0,
     })
     assert.ok(data instanceof Uint8Array)
     assert.ok(data.length > 1)
