@@ -1,4 +1,5 @@
 export type AudioSamples = {
-  channelsData: Float32Array[]
+  data: Float32Array
+  channels: number
   sampleRate: number
 }

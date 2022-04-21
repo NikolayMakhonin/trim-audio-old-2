@@ -47,12 +47,13 @@ export function generateTestSamples({
 }) {
   const samplesCount = durationSec * sampleRate
   const samples: AudioSamples = {
-    channelsData: [new Float32Array(samplesCount), new Float32Array(samplesCount)],
+    data    : new Float32Array(samplesCount * 2),
+    channels: 2,
     sampleRate,
   }
   for (let i = 0; i < samplesCount; i++) {
-    samples.channelsData[0][i] = audioFunc(i / sampleRate, 0)
-    samples.channelsData[1][i] = audioFunc(i / sampleRate, 1)
+    samples.data[i * 2] = audioFunc(i / sampleRate, 0)
+    samples.data[i * 2 + 1] = audioFunc(i / sampleRate, 1)
   }
   return samples
 }
@@ -113,10 +114,9 @@ export function checkSamples({
   checkAudioDurationSec: number,
   checkChannelCount: number,
 }) {
-  const channelCount = samples.channelsData.length
-  // assert.strictEqual(channelCount, checkChannelCount)
+  assert.strictEqual(samples.data.length % samples.channels, 0)
+  const samplesCount = samples.data.length / samples.channels
 
-  const samplesCount = samples.channelsData[0].length
   const sampleRate = samples.sampleRate
   const checkFirstMaximum = getFirstMaximum({
     samplesCount,
@@ -126,7 +126,7 @@ export function checkSamples({
   const firstMaximum = getFirstMaximum({
     samplesCount,
     windowSize: Math.round(0.1 * sampleRate),
-    getSample : o => samples.channelsData[0][o],
+    getSample : o => samples.data[o * 2],
   })
   const startSample = firstMaximum.index - checkFirstMaximum.index
   const startTime = startSample / sampleRate
@@ -142,13 +142,11 @@ export function checkSamples({
   assert.ok(totalDuration >= checkAudioDurationSec - 0.05, totalDuration + '')
   assert.ok(totalDuration <= checkAudioDurationSec + 0.05, totalDuration + '')
   
-  for (let channel = 0; channel < channelCount; channel++) {
-    const channelData = samples.channelsData[channel]
-    assert.strictEqual(channelData.length, samplesCount, channelData.length + '')
-
+  for (let channel = 0; channel < samples.channels; channel++) {
     let sumError = 0
     for (let i = startSample; i < samplesCount; i++) {
-      const sample = channelData[i]
+      const sample = i < 0 ? 0 : samples.data[i * 2 + channel]
+      assert.ok(Number.isFinite(sample))
       const checkSample = checkAudioFunc(
         (i - startSample) / sampleRate,
         checkChannelCount > 1 ? channel : 0,
@@ -158,12 +156,31 @@ export function checkSamples({
     }
 
     const avgError = sumError / samplesCount
+    assert.ok(Number.isFinite(avgError))
     assert.ok(avgError < 0.05, avgError + '')
   }
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+export function getAssetPath(assetFileName: string) {
+  const filePath = path.resolve(__dirname, 'assets', assetFileName)
+  return filePath
+}
+
+export async function getAssetData(assetFileName: string) {
+  const filePath = getAssetPath(assetFileName)
+  const buffer = await fse.readFile(filePath)
+  return new Uint8Array(buffer)
+}
+
 export function createAssetStream(assetFileName: string) {
+  const filePath = path.resolve(__dirname, 'assets', assetFileName)
+  const stream = fse.createReadStream(filePath)
+  return stream
+}
+
+export function loadAssetData(assetFileName: string) {
   const filePath = path.resolve(__dirname, 'assets', assetFileName)
   const stream = fse.createReadStream(filePath)
   return stream

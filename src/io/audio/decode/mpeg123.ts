@@ -1,35 +1,40 @@
-import CodecParser from 'codec-parser'
-import { MPEGDecoderWebWorker } from 'mpg123-decoder'
-import {Readable} from 'stream'
-import {streamForEach} from '../../helpers/stream'
+import {getFFmpeg} from '../common/ffmpeg'
 import {AudioSamples} from '../contracts'
 
-const parser = new CodecParser('audio/mpeg', {})
+export async function decodeMpeg123(mp3Data: Uint8Array): Promise<AudioSamples> {
+  const channels = 2
+  const sampleRate = 16000
 
-export async function decodeMpeg123Stream(stream: Readable): Promise<AudioSamples> {
-  const wasmDecoder = new MPEGDecoderWebWorker()
-  try {
-    const allFrames: Uint8Array[] = []
-    await streamForEach(stream, chunk => {
-      for (const chunkParsed of parser.parseChunk(new Uint8Array(chunk))) {
-        if (chunkParsed.codecFrames) {
-          for (let i = 0, len = chunkParsed.codecFrames.length; i < len; i++) {
-            const frame = chunkParsed.codecFrames[i]
-            allFrames.push(frame.data)
-          }
-        } else {
-          allFrames.push(chunkParsed.data)
-        }
-      }
-    })
+  const ffmpeg = await getFFmpeg()
 
-    const result = await wasmDecoder.decodeFrames(allFrames)
+  // docs: https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md
+  ffmpeg.FS(
+    'writeFile',
+    'input.mp3',
+    mp3Data,
+  )
 
-    return {
-      channelsData: result.channelData,
-      sampleRate  : result.sampleRate,
-    }
-  } finally {
-    await wasmDecoder.free()
+  await ffmpeg.run(
+    '-i', 'input.mp3',
+    '-f', 'f32le',
+    '-ac', channels + '',
+    '-ar', sampleRate + '',
+    '-acodec', 'pcm_f32le',
+    // '-codec:a', 'libmp3lame',
+    'output.pcm',
+  )
+
+  const pcmData = ffmpeg.FS(
+    'readFile',
+    'output.pcm',
+  )
+
+  ffmpeg.FS('unlink', 'input.mp3')
+  ffmpeg.FS('unlink', 'output.pcm')
+
+  return {
+    data: new Float32Array(pcmData.buffer, pcmData.byteOffset, pcmData.byteLength / 4),
+    channels,
+    sampleRate,
   }
 }

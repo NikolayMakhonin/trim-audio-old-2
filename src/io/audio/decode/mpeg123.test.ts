@@ -1,16 +1,16 @@
-import {decodeMpeg123Stream} from './mpeg123'
+import {decodeMpeg123} from './mpeg123'
 import {
   checkSamples,
-  createAssetStream,
+  getAssetData,
   testAudioFunc,
 } from '../test/testDecodeEncode'
 
 describe('io > audio > decode > mpeg123', function () {
-  this.timeout(30000)
+  this.timeout(60000)
 
   it('mp3-joint-stereo-vbr', async function () {
-    const stream = createAssetStream('mp3-joint-stereo-vbr.mp3')
-    const samples = await decodeMpeg123Stream(stream)
+    const data = await getAssetData('mp3-joint-stereo-vbr.mp3')
+    const samples = await decodeMpeg123(data)
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -20,8 +20,8 @@ describe('io > audio > decode > mpeg123', function () {
   })
 
   it('mp3-stereo-vbr', async function () {
-    const stream = createAssetStream('mp3-stereo-vbr.mp3')
-    const samples = await decodeMpeg123Stream(stream)
+    const data = await getAssetData('mp3-stereo-vbr.mp3')
+    const samples = await decodeMpeg123(data)
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -31,8 +31,8 @@ describe('io > audio > decode > mpeg123', function () {
   })
 
   it('mp3-mono-vbr', async function () {
-    const stream = createAssetStream('mp3-mono-vbr.mp3')
-    const samples = await decodeMpeg123Stream(stream)
+    const data = await getAssetData('mp3-mono-vbr.mp3')
+    const samples = await decodeMpeg123(data)
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -42,8 +42,8 @@ describe('io > audio > decode > mpeg123', function () {
   })
 
   it('mp3-mono', async function () {
-    const stream = createAssetStream('mp3-mono.mp3')
-    const samples = await decodeMpeg123Stream(stream)
+    const data = await getAssetData('mp3-mono.mp3')
+    const samples = await decodeMpeg123(data)
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,

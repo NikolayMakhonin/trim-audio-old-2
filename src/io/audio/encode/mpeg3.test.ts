@@ -1,12 +1,11 @@
 import {encodeMpeg3} from './mpeg3'
 import {
   checkSamples,
-  createAssetStream, generateTestSamples, saveFile,
+  generateTestSamples,
+  saveFile,
   testAudioFunc,
 } from '../test/testDecodeEncode'
-import {Readable} from 'stream'
-import {decodeMpeg123Stream} from '../decode/mpeg123'
-import {toReadable} from '../../helpers/stream'
+import {decodeMpeg123} from '../decode/mpeg123'
 
 describe('io > audio > encode > mpeg3', function () {
   this.timeout(60000)
@@ -17,17 +16,16 @@ describe('io > audio > encode > mpeg3', function () {
       sampleRate : 16000,
       durationSec: 7,
     })
-    const data = await encodeMpeg3(originalSamples, {
+    const mp3Data = await encodeMpeg3(originalSamples, {
       bitrate: 8,
       // vbrQuality: 0,
     })
-    assert.ok(data instanceof Uint8Array)
-    assert.ok(data.length > 1)
+    assert.ok(mp3Data instanceof Uint8Array)
+    assert.ok(mp3Data.length > 1)
 
-    await saveFile('mpeg3.mp3', data)
+    await saveFile('mpeg3.mp3', mp3Data)
 
-    const stream = toReadable(data)
-    const samples = await decodeMpeg123Stream(stream)
+    const samples = await decodeMpeg123(mp3Data)
     // const samples = originalSamples
 
     checkSamples({

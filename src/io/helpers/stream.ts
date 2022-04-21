@@ -38,6 +38,15 @@ export function streamForEach(stream: Readable, callback: (chunk) => void): Prom
   })
 }
 
+export async function streamBuffer(stream: Readable, callback: (chunk) => void): Promise<Buffer> {
+  const chunks = []
+  await streamForEach(stream, chunk => {
+    chunks.push(chunk)
+  })
+  const buffer = Buffer.concat(chunks)
+  return buffer
+}
+
 // from: https://github.com/sindresorhus/to-readable-stream/blob/main/index.js
 export function toReadable(value) {
   return new Readable({
