@@ -18,12 +18,12 @@ describe('io > audio > encode > mpeg3', function () {
       durationSec: 7,
     })
     const data = await encodeMpeg3(originalSamples, {
-      bitrate: 128,
+      bitrate: 8,
     })
     assert.ok(data instanceof Uint8Array)
     assert.ok(data.length > 1)
 
-    // await saveFile('mpeg3.mp3', data)
+    await saveFile('mpeg3.mp3', data)
 
     const stream = toReadable(data)
     const samples = await decodeMpeg123Stream(stream)

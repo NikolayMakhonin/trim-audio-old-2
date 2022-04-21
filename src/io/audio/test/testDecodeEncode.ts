@@ -82,7 +82,7 @@ function getFirstMaximum({
       if (i === windowSize - 1 || avg > prevAvg) {
         prevAvg = avg
         maximumStart = i
-      } else if (avg < prevAvg) {
+      } else if (prevAvg > 0.1 && avg < prevAvg) {
         maximumEnd = i - 1
         break
       }
@@ -93,9 +93,12 @@ function getFirstMaximum({
     throw new Error('Cannot find first maximum')
   }
 
+  const index = Math.round((maximumEnd + maximumStart - windowSize) / 2)
+  const value = getSample(index)
+
   return {
-    index: Math.round((maximumEnd + maximumStart - windowSize) / 2),
-    value: prevAvg,
+    index,
+    value,
   }
 }
 
