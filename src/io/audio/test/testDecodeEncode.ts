@@ -145,7 +145,7 @@ export function checkSamples({
   for (let channel = 0; channel < samples.channels; channel++) {
     let sumError = 0
     for (let i = startSample; i < samplesCount; i++) {
-      const sample = i < 0 ? 0 : samples.data[i * 2 + channel]
+      const sample = i < 0 ? 0 : samples.data[i * 2 + (checkChannelCount > 1 ? channel : 0)]
       assert.ok(Number.isFinite(sample))
       const checkSample = checkAudioFunc(
         (i - startSample) / sampleRate,
