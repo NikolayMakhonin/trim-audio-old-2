@@ -6,5 +6,10 @@ module.exports = {
   ],
   'watch-files': ['./src/**'],
   // 'loader': 'ts-node/esm',
-  "node-option": ["experimental-specifier-resolution=node", "loader=ts-node/esm"],
+  "node-option": [
+    "experimental-specifier-resolution=node",
+    "loader=ts-node/esm",
+    "experimental-wasm-threads",
+    "experimental-wasm-bulk-memory",
+  ],
 }

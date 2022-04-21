@@ -9,7 +9,7 @@ import {decodeMpeg123Stream} from '../decode/mpeg123'
 import {toReadable} from '../../helpers/stream'
 
 describe('io > audio > encode > mpeg3', function () {
-  this.timeout(30000)
+  this.timeout(60000)
 
   it('mp3-joint-stereo-vbr', async function () {
     const originalSamples = generateTestSamples({
@@ -18,7 +18,8 @@ describe('io > audio > encode > mpeg3', function () {
       durationSec: 7,
     })
     const data = await encodeMpeg3(originalSamples, {
-      bitrate: 8,
+      // bitrate: 8,
+      vbrQuality: 0,
     })
     assert.ok(data instanceof Uint8Array)
     assert.ok(data.length > 1)

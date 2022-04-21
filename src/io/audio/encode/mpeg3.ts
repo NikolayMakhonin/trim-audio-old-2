@@ -101,10 +101,10 @@ export async function encodeMpeg3(samples: AudioSamples, options?: {
   } else {
     const channelsCount = samples.channelsData.length
     const samplesCount = samples.channelsData[0].length
-    samplesCombined = new Float32Array(samplesCount)
+    samplesCombined = new Float32Array(samplesCount * channelsCount)
     for (let i = 0; i < samplesCount; i++) {
       for (let j = 0; j < channelsCount; j++) {
-        samplesCombined[i * channelsCount * j] = samples.channelsData[j][i]
+        samplesCombined[i * channelsCount + j] = samples.channelsData[j][i]
       }
     }
   }
@@ -123,9 +123,11 @@ export async function encodeMpeg3(samples: AudioSamples, options?: {
   )
 
   await ffmpeg.run(
-    '-f', 's16le',
+    '-f', 'f32le',
     '-ar', samples.sampleRate + '',
     '-ac', samples.channelsData.length + '',
+    // '-codec:a', 'libmp3lame',
+    // options.bitrate ? '-b:a' : '-q:a', options.bitrate ? options.bitrate + 'k' : options.vbrQuality + '',
     '-i', 'input.pcm',
     'output.mp3',
   )

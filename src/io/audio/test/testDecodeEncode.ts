@@ -131,7 +131,7 @@ export function checkSamples({
   const startSample = firstMaximum.index - checkFirstMaximum.index
   const startTime = startSample / sampleRate
 
-  assert.ok(startTime >= -0.005, startTime + '')
+  assert.ok(startTime >= -0.1, startTime + '')
   assert.ok(startTime <= 0.2, startTime + '')
 
   const amplitude = firstMaximum.value / checkFirstMaximum.value
