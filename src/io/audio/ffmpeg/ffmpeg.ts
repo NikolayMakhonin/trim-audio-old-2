@@ -104,14 +104,16 @@ export async function ffmpegEncode(samples: AudioSamples, {
     samples.data.byteLength,
   )
 
+  // docs: https://trac.ffmpeg.org/wiki/AudioChannelManipulation
   const outputData = await _ffmpegTransform(pcmData, {
     inputFile,
     outputFile,
     params: [
       '-f', 'f32le',
-      '-ac', (channels || samples.channels) + '',
+      '-ac', samples.channels + '',
       '-ar', samples.sampleRate + '',
       '-i', 'input.pcm',
+      '-ac', (channels || samples.channels) + '',
       ...params || [],
       outputFile,
     ],

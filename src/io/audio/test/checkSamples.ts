@@ -65,12 +65,12 @@ export function checkSamples({
   const checkFirstMaximum = getFirstMaximum({
     samplesCount,
     windowSize: Math.round(0.1 * sampleRate),
-    getSample: o => checkAudioFunc(o / sampleRate, 0),
+    getSample : o => checkAudioFunc(o / sampleRate, 0),
   })
   const firstMaximum = getFirstMaximum({
     samplesCount,
     windowSize: Math.round(0.1 * sampleRate),
-    getSample: o => samples.data[o * samples.channels],
+    getSample : o => samples.data[o * samples.channels],
   })
   const startSample = firstMaximum.index - checkFirstMaximum.index
   const startTime = startSample / sampleRate

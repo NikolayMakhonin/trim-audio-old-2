@@ -40,11 +40,9 @@ export async function ffmpegTestEncode({
 
   const metadata = await musicMetadata.parseBuffer(data)
 
-  const channels = encodeArgs.channels || input.channels
-
   assert.strictEqual(metadata.format.sampleRate, input.sampleRate)
-  assert.strictEqual(metadata.format.numberOfChannels, channels)
-  const checkDuration = input.data.length / channels / input.sampleRate
+  assert.strictEqual(metadata.format.numberOfChannels, encodeArgs.channels || input.channels)
+  const checkDuration = input.data.length / input.channels / input.sampleRate
   assert.ok(metadata.format.duration >= checkDuration - 0.05, metadata.format.duration + '')
   assert.ok(metadata.format.duration <= checkDuration + 0.15, metadata.format.duration + '')
   checkEncodedMetadata(metadata)
@@ -208,7 +206,7 @@ export async function ffmpegTestMonoSplit({
       },
       checkDecoded: {
         isMono      : true,
-        minAmplitude: 0.6,
+        minAmplitude: 0.4,
       },
     },
   })
