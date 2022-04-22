@@ -1,12 +1,34 @@
 import {decodeMpeg123} from './mpeg123'
 import {
   checkSamples,
-  getAssetData,
+  getAssetData, saveFile,
   testAudioFunc,
 } from '../test/testDecodeEncode'
+import {encodeMpeg3} from '../encode/mpeg3'
 
 describe('io > audio > decode > mpeg123', function () {
   this.timeout(60000)
+
+  it('opus-stereo-vbr', async function () {
+    const data = await getAssetData('test.wav')
+    const samples = await decodeMpeg123({
+      data,
+      channels  : 2,
+      sampleRate: 16000,
+    })
+
+    const mp3Data = await encodeMpeg3(samples, {
+      bitrate: 8,
+      // vbrQuality: 0,
+    })
+    await saveFile('mpeg3.opus', mp3Data)
+
+    checkSamples({
+      samples,
+      checkAudioFunc       : testAudioFunc,
+      checkAudioDurationSec: 7,
+    })
+  })
 
   describe('base', function () {
     it('mp3-stereo-vbr', async function () {

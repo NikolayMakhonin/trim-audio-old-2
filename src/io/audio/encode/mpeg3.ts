@@ -29,18 +29,18 @@ export async function encodeMpeg3(samples: AudioSamples, options?: {
     '-ac', samples.channels + '',
     '-ar', samples.sampleRate + '',
     '-i', 'input.pcm',
-    // '-codec:a', 'libmp3lame',
+    // '-c:a', 'libopus',
     options.bitrate ? '-b:a' : '-q:a', options.bitrate ? options.bitrate + 'k' : options.vbrQuality + '',
-    'output.mp3',
+    'output.opus',
   )
 
   const mp3Data = ffmpeg.FS(
     'readFile',
-    'output.mp3',
+    'output.opus',
   )
 
   ffmpeg.FS('unlink', 'input.pcm')
-  ffmpeg.FS('unlink', 'output.mp3')
+  ffmpeg.FS('unlink', 'output.opus')
 
   return mp3Data
 }
