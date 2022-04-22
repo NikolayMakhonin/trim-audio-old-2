@@ -1,5 +1,5 @@
 import {AudioSamples} from '../contracts'
-import {getFFmpeg} from '../common/ffmpeg'
+import {getFFmpeg} from '../ffmpeg/ffmpeg'
 
 export type Mp3CbrValues = 8 | 16 | 24 | 32 | 40 | 48 | 64 | 80 | 96 | 112 | 128 | 160 | 192 | 224 | 256 | 320
 export type Mp3VbrValues = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9

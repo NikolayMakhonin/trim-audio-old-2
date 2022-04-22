@@ -1,11 +1,11 @@
 import {encodeMpeg3} from './mpeg3'
 import {
-  checkSamples,
-  generateTestSamples,
   saveFile,
-  testAudioFunc,
-} from '../test/testDecodeEncode'
+
+} from '../test/saveFile'
 import {decodeMpeg123} from '../decode/mpeg123'
+import {generateTestSamples, testAudioFunc} from '../test/generateTestSamples'
+import {checkSamples} from '../test/checkSamples'
 
 describe('io > audio > encode > mpeg3', function () {
   this.timeout(60000)

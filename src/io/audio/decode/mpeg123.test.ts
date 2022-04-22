@@ -1,10 +1,12 @@
 import {decodeMpeg123} from './mpeg123'
 import {
-  checkSamples,
-  getAssetData, saveFile,
-  testAudioFunc,
-} from '../test/testDecodeEncode'
+  saveFile,
+
+} from '../test/saveFile'
 import {encodeMpeg3} from '../encode/mpeg3'
+import {testAudioFunc} from '../test/generateTestSamples'
+import {checkSamples} from '../test/checkSamples'
+import {getAssetData} from '../test/getAsset'
 
 describe('io > audio > decode > mpeg123', function () {
   this.timeout(60000)

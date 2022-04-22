@@ -4,33 +4,29 @@ import {AudioSamples} from '../contracts'
 let ffmpegLoadPromise: Promise<FFmpeg>
 export function getFFmpeg() {
   if (!ffmpegLoadPromise) {
-    const ffmpeg = createFFmpeg({ log: false })
+    const ffmpeg = createFFmpeg({
+      log: true,
+      logger: ({message}) => console.log(message),
+    })
     ffmpegLoadPromise = ffmpeg.load().then(() => ffmpeg)
   }
 
   return ffmpegLoadPromise
 }
 
-export async function ffmpegConvert(inputData: Uint8Array, {
-  inputFormat,
-  outputFormat,
-  channels,
-  sampleRate,
+getFFmpeg()
+
+async function _ffmpegTransform(inputData: Uint8Array, {
+  inputFile,
+  outputFile,
   params,
 }: {
-  /** same as file extension */
-  inputFormat?: string,
-  /** same as file extension */
-  outputFormat?: string,
-  channels: number,
-  sampleRate: number,
+  inputFile?: string,
+  outputFile?: string,
   params?: string[],
 }): Promise<Uint8Array> {
   const ffmpeg = await getFFmpeg()
 
-  const inputFile = 'input' + (inputFormat ? '.' + inputFormat : '')
-  const outputFile = 'output' + (outputFormat ? '.' + outputFormat : '')
-  
   // docs: https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md
   ffmpeg.FS(
     'writeFile',
@@ -38,14 +34,7 @@ export async function ffmpegConvert(inputData: Uint8Array, {
     inputData,
   )
 
-  await ffmpeg.run(
-    '-i', 'input',
-    '-f', 'f32le',
-    '-ac', channels + '',
-    '-ar', sampleRate + '',
-    ...params || [],
-    outputFile,
-  )
+  await ffmpeg.run(...params)
 
   const outputData = ffmpeg.FS(
     'readFile',
@@ -68,12 +57,20 @@ export async function ffmpegDecode(inputData: Uint8Array, {
   channels: number,
   sampleRate: number,
 }): Promise<AudioSamples> {
-  const outputData = await ffmpegConvert(inputData, {
-    inputFormat,
-    outputFormat: 'pcm',
-    channels,
-    sampleRate,
-    params      : ['-acodec', 'pcm_f32le'],
+  const inputFile = 'input' + (inputFormat ? '.' + inputFormat : '')
+  const outputFile = 'output.pcm'
+
+  const outputData = await _ffmpegTransform(inputData, {
+    inputFile,
+    outputFile,
+    params: [
+      '-i', inputFile,
+      '-f', 'f32le',
+      '-ac', channels + '',
+      '-ar', sampleRate + '',
+      '-acodec', 'pcm_f32le',
+      outputFile,
+    ],
   })
   
   return {
@@ -91,18 +88,26 @@ export async function ffmpegEncode(samples: AudioSamples, {
   outputFormat: string,
   params?: string[],
 }): Promise<Uint8Array> {
+  const inputFile = 'input.pcm'
+  const outputFile = 'output' + (outputFormat ? '.' + outputFormat : '')
+
   const pcmData = new Uint8Array(
     samples.data.buffer,
     samples.data.byteOffset,
     samples.data.byteLength,
   )
-  
-  const outputData = await ffmpegConvert(pcmData, {
-    inputFormat: 'pcm',
-    outputFormat,
-    channels   : samples.channels,
-    sampleRate : samples.sampleRate,
-    params,
+
+  const outputData = await _ffmpegTransform(pcmData, {
+    inputFile,
+    outputFile,
+    params: [
+      '-f', 'f32le',
+      '-ac', samples.channels + '',
+      '-ar', samples.sampleRate + '',
+      '-i', 'input.pcm',
+      ...params || [],
+      outputFile,
+    ],
   })
 
   return outputData

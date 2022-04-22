@@ -1,4 +1,4 @@
-import {ffmpegConvert, getFFmpeg} from '../common/ffmpeg'
+import {ffmpegConvert, getFFmpeg} from '../ffmpeg/ffmpeg'
 import {AudioSamples} from '../contracts'
 
 export async function decodeMpeg123({
