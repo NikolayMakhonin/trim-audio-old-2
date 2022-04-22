@@ -73,14 +73,14 @@ export async function ffmpegTestDecode({
 }) {
   const samples = await ffmpegDecode(inputData, decodeArgs)
   
-  const _data = await ffmpegEncode(samples, {
-    outputFormat: 'mp3',
-    params      : ffmpegEncodeMp3Params({
-      bitrate: 8,
-      mode   : 'cbr',
-    }),
-  })
-  await saveFile('mpeg.mp3', _data)
+  // const _data = await ffmpegEncode(samples, {
+  //   outputFormat: 'mp3',
+  //   params      : ffmpegEncodeMp3Params({
+  //     bitrate: 8,
+  //     mode   : 'cbr',
+  //   }),
+  // })
+  // await saveFile('mpeg.mp3', _data)
   
   checkSamples({
     samples,
