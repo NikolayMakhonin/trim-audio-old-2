@@ -5,10 +5,10 @@ import {testAudioFunc} from '../test/generateTestSamples'
 import {checkSamples} from '../test/checkSamples'
 import {saveFile} from '../test/saveFile'
 
-describe('io > audio > ffmpeg > ffmpegMp3Params', function () {
+describe('io > audio > ffmpeg > ffmpegEncodeMp3Params', function () {
   this.timeout(60000)
 
-  it('mp3-stereo', async function () {
+  it('stereo', async function () {
     const data = await ffmpegEncode(testSamplesStereo, {
       outputFormat: 'mp3',
       params      : ffmpegEncodeMp3Params({

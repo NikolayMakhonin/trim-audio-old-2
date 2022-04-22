@@ -8,7 +8,7 @@ import {testAudioFunc} from '../test/generateTestSamples'
 import {checkSamples} from '../test/checkSamples'
 import {getAssetData} from '../test/getAsset'
 
-describe('io > audio > decode > mpeg123', function () {
+xdescribe('io > audio > decode > mpeg123', function () {
   this.timeout(60000)
 
   it('opus-stereo-vbr', async function () {
