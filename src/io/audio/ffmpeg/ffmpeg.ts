@@ -47,16 +47,18 @@ async function _ffmpegTransform(inputData: Uint8Array, {
   return outputData
 }
 
+export type FFmpegDecodeArgs = {
+  inputFormat?: string,
+  channels: number,
+  sampleRate: number,
+}
+
 export async function ffmpegDecode(inputData: Uint8Array, {
   /** same as file extension */
   inputFormat,
   channels,
   sampleRate,
-}: {
-  inputFormat?: string,
-  channels: number,
-  sampleRate: number,
-}): Promise<AudioSamples> {
+}: FFmpegDecodeArgs): Promise<AudioSamples> {
   const inputFile = 'input' + (inputFormat ? '.' + inputFormat : '')
   const outputFile = 'output.pcm'
 
@@ -80,14 +82,16 @@ export async function ffmpegDecode(inputData: Uint8Array, {
   }
 }
 
-export async function ffmpegEncode(samples: AudioSamples, {
-  outputFormat,
-  params,
-}: {
+export type FFmpegEncodeArgs = {
   /** same as file extension */
   outputFormat: string,
   params?: string[],
-}): Promise<Uint8Array> {
+}
+
+export async function ffmpegEncode(samples: AudioSamples, {
+  outputFormat,
+  params,
+}: FFmpegEncodeArgs): Promise<Uint8Array> {
   const inputFile = 'input.pcm'
   const outputFile = 'output' + (outputFormat ? '.' + outputFormat : '')
 
