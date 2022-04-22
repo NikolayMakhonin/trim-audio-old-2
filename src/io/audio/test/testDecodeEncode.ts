@@ -107,12 +107,14 @@ export function checkSamples({
   samples,
   checkAudioFunc,
   checkAudioDurationSec,
-  checkChannelCount,
+  isMono,
+  minAmplitude,
 }: {
   samples: AudioSamples,
   checkAudioFunc: (time: number, channel: number) => number,
   checkAudioDurationSec: number,
-  checkChannelCount: number,
+  isMono?: boolean,
+  minAmplitude?: number,
 }) {
   assert.strictEqual(samples.data.length % samples.channels, 0)
   const samplesCount = samples.data.length / samples.channels
@@ -135,7 +137,7 @@ export function checkSamples({
   assert.ok(startTime <= 0.2, startTime + '')
 
   const amplitude = firstMaximum.value / checkFirstMaximum.value
-  assert.ok(amplitude >= 0.85, amplitude + '')
+  assert.ok(amplitude >= (minAmplitude ?? 0.85), amplitude + '')
   assert.ok(amplitude <= 1.05, amplitude + '')
 
   const totalDuration = (samplesCount - startSample) / samples.sampleRate
@@ -145,19 +147,19 @@ export function checkSamples({
   for (let channel = 0; channel < samples.channels; channel++) {
     let sumError = 0
     for (let i = startSample; i < samplesCount; i++) {
-      const sample = i < 0 ? 0 : samples.data[i * samples.channels + (checkChannelCount > 1 ? channel : 0)]
+      const sample = i < 0 ? 0 : samples.data[i * samples.channels + channel] / amplitude
       assert.ok(Number.isFinite(sample))
       const checkSample = checkAudioFunc(
         (i - startSample) / sampleRate,
-        checkChannelCount > 1 ? channel : 0,
-      ) * amplitude
+        isMono ? 0 : channel,
+      )
       const error = Math.abs(checkSample - sample)
       sumError += error * error
     }
 
     const avgError = sumError / samplesCount
     assert.ok(Number.isFinite(avgError))
-    assert.ok(avgError < 0.05, avgError + '')
+    assert.ok(avgError < 0.06, avgError + '')
   }
 }
 

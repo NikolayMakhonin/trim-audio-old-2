@@ -36,7 +36,6 @@ describe('io > audio > encode > mpeg3', function () {
       samples,
       checkAudioFunc       : testAudioFunc,
       checkAudioDurationSec: 7,
-      checkChannelCount    : 2,
     })
   })
 })

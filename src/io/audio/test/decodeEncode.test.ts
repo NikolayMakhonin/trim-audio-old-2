@@ -17,7 +17,6 @@
 //       samples,
 //       checkAudioFunc       : testAudioFunc,
 //       checkAudioDurationSec: 7,
-//       checkChannelCount    : 2,
 //       amplitude: 0.9,
 //       startTimeSec: 0.069,
 //     })
@@ -32,7 +31,6 @@
 //           samples,
 //           checkAudioFunc       : testAudioFunc,
 //           checkAudioDurationSec: 7,
-//           checkChannelCount    : 2,
 //           amplitude: 0.9,
 //           startTimeSec: 0.069,
 //         })
