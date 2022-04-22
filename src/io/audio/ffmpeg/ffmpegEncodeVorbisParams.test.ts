@@ -39,7 +39,7 @@ describe('io > audio > ffmpeg > ffmpegEncodeVorbisParams', function () {
         checkEncodedMetadata(metadata) {
           assert.strictEqual(metadata.format.container, 'Ogg')
           assert.strictEqual(metadata.format.codec, 'Vorbis I')
-          assert.ok(metadata.format.bitrate > 60000, metadata.format.bitrate + '')
+          assert.ok(metadata.format.bitrate > 23000, metadata.format.bitrate + '')
           assert.ok(metadata.format.bitrate <= 70000, metadata.format.bitrate + '')
         },
       },
