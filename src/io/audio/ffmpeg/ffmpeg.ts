@@ -85,11 +85,14 @@ export async function ffmpegDecode(inputData: Uint8Array, {
 export type FFmpegEncodeArgs = {
   /** same as file extension */
   outputFormat: string,
+  /** force channel count */
+  channels?: number,
   params?: string[],
 }
 
 export async function ffmpegEncode(samples: AudioSamples, {
   outputFormat,
+  channels,
   params,
 }: FFmpegEncodeArgs): Promise<Uint8Array> {
   const inputFile = 'input.pcm'
@@ -106,7 +109,7 @@ export async function ffmpegEncode(samples: AudioSamples, {
     outputFile,
     params: [
       '-f', 'f32le',
-      '-ac', samples.channels + '',
+      '-ac', (channels || samples.channels) + '',
       '-ar', samples.sampleRate + '',
       '-i', 'input.pcm',
       ...params || [],

@@ -9,25 +9,42 @@ export function testAudioFunc(time: number, channel: number, splitMono?: boolean
     return 0
   }
 
-  switch (channel) {
-    case 0:
-      if (time <= 2) {
-        return Math.sin(time * 2 * Math.PI)
-      }
-      if (splitMono || time <= 4) {
+  if (!splitMono) {
+    switch (channel) {
+      case 0:
+        if (time <= 2) {
+          return Math.sin(time * 2 * Math.PI)
+        }
+        if (time <= 4) {
+          return 0
+        }
+        return 0.5 * Math.sin((time - 4) * 4 * Math.PI)
+      case 1:
+        if (time <= 3) {
+          return 0.5 * Math.sin(time * 4 * Math.PI)
+        }
+        if (time <= 5) {
+          return 0
+        }
+        return Math.sin((time - 5) * 2 * Math.PI)
+      default:
+        throw new Error('channel === ' + channel)
+    }
+  } else {
+    switch (channel) {
+      case 0:
+        if (time <= 2) {
+          return Math.sin(time * 2 * Math.PI)
+        }
         return 0
-      }
-      return Math.sin((time - 4) * 4 * Math.PI)
-    case 1:
-      if (!splitMono && time <= 3) {
-        return Math.sin(time * 4 * Math.PI)
-      }
-      if (time <= 5) {
-        return 0
-      }
-      return Math.sin((time - 5) * 2 * Math.PI)
-    default:
-      throw new Error('channel === ' + channel)
+      case 1:
+        if (time <= 4) {
+          return 0
+        }
+        return 0.5 * Math.sin((time - 4) * 4 * Math.PI)
+      default:
+        throw new Error('channel === ' + channel)
+    }
   }
 }
 

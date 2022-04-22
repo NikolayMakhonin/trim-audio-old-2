@@ -5,6 +5,7 @@ import {testAudioFunc} from '../../test/generateTestSamples'
 import * as musicMetadata from 'music-metadata'
 import {IAudioMetadata} from 'music-metadata/lib/type'
 import {AudioSamples} from '../../contracts'
+import {saveFile} from '../../test/saveFile'
 import {ffmpegEncodeMp3Params} from '../ffmpegEncodeMp3Params'
 
 export async function ffmpegTestEncode({
@@ -39,10 +40,11 @@ export async function ffmpegTestEncode({
 
   const metadata = await musicMetadata.parseBuffer(data)
 
-  assert.strictEqual(metadata.format.sampleRate, 16000)
-  assert.strictEqual(metadata.format.numberOfChannels, 2)
-  assert.ok(metadata.format.duration >= 6.95, metadata.format.duration + '')
-  assert.ok(metadata.format.duration <= 7.15, metadata.format.duration + '')
+  assert.strictEqual(metadata.format.sampleRate, input.sampleRate)
+  assert.strictEqual(metadata.format.numberOfChannels, input.channels)
+  const checkDuration = input.data.length / input.channels / input.sampleRate
+  assert.ok(metadata.format.duration >= checkDuration - 0.05, metadata.format.duration + '')
+  assert.ok(metadata.format.duration <= checkDuration + 0.15, metadata.format.duration + '')
   checkEncodedMetadata(metadata)
 
   // await saveFile('mpeg.mp3', data)
@@ -70,7 +72,16 @@ export async function ffmpegTestDecode({
   },
 }) {
   const samples = await ffmpegDecode(inputData, decodeArgs)
-
+  
+  const _data = await ffmpegEncode(samples, {
+    outputFormat: 'mp3',
+    params      : ffmpegEncodeMp3Params({
+      bitrate: 8,
+      mode   : 'cbr',
+    }),
+  })
+  await saveFile('mpeg.mp3', _data)
+  
   checkSamples({
     samples,
     checkAudioFunc       : testAudioFunc,
@@ -129,7 +140,6 @@ export async function ffmpegTestMono({
       },
       checkDecoded: {
         isMono: true,
-        // minAmplitude: 0.6,
       },
     },
   })
@@ -142,8 +152,8 @@ export async function ffmpegTestMono({
         sampleRate: 32000,
       },
       checkDecoded: {
-        isMono: true,
-        // minAmplitude: 0.6,
+        isMono      : true,
+        minAmplitude: 0.6,
       },
     },
   })
@@ -157,7 +167,7 @@ export async function ffmpegTestMonoSplit({
     checkEncodedMetadata: (metadata: IAudioMetadata) => void,
   },
 }) {
-  const data = await ffmpegTestEncode({
+  let data = await ffmpegTestEncode({
     inputType: 'mono-split',
     encode,
   })
@@ -172,6 +182,17 @@ export async function ffmpegTestMonoSplit({
       checkDecoded: {
         isMono      : true,
         minAmplitude: 0.6,
+      },
+    },
+  })
+
+  data = await ffmpegTestEncode({
+    inputType: 'mono-split',
+    encode   : {
+      ...encode,
+      encodeArgs: {
+        ...encode.encodeArgs,
+        channels: 1,
       },
     },
   })
