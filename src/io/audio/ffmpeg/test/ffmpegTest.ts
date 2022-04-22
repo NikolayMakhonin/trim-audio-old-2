@@ -5,8 +5,6 @@ import {testAudioFunc} from '../../test/generateTestSamples'
 import * as musicMetadata from 'music-metadata'
 import {IAudioMetadata} from 'music-metadata/lib/type'
 import {AudioSamples} from '../../contracts'
-import {saveFile} from '../../test/saveFile'
-import {ffmpegEncodeMp3Params} from '../ffmpegEncodeMp3Params'
 
 export async function ffmpegTestEncode({
   inputType,
@@ -39,7 +37,9 @@ export async function ffmpegTestEncode({
   const data = await ffmpegEncode(input, encodeArgs)
 
   if (checkEncodedMetadata) {
-    const metadata = await musicMetadata.parseBuffer(data)
+    const metadata = await musicMetadata.parseBuffer(data, {
+      mimeType: 'audio/ogg',
+    })
 
     assert.strictEqual(metadata.format.sampleRate, input.sampleRate)
     assert.strictEqual(metadata.format.numberOfChannels, encodeArgs.channels || input.channels)
