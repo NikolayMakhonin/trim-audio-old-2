@@ -1,11 +1,11 @@
 import {ffmpegEncodeMp3Params} from './ffmpegEncodeMp3Params'
-import {ffmpegTest} from './test/ffmpegTest'
+import {ffmpegTestDecode, ffmpegTestEncode} from './test/ffmpegTest'
 
 describe('io > audio > ffmpeg > ffmpegEncodeMp3Params', function () {
   this.timeout(60000)
 
   it('stereo', async function () {
-    await ffmpegTest({
+    const data = await ffmpegTestEncode({
       inputType: 'stereo',
       encode   : {
         encodeArgs: {
@@ -23,7 +23,11 @@ describe('io > audio > ffmpeg > ffmpegEncodeMp3Params', function () {
           assert.strictEqual(metadata.format.codecProfile, 'CBR')
         },
       },
-      decode: {
+    })
+
+    await ffmpegTestDecode({
+      inputData: data,
+      decode   : {
         decodeArgs: {
           channels  : 2,
           sampleRate: 32000,
