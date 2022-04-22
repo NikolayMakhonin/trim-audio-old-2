@@ -38,14 +38,16 @@ export async function ffmpegTestEncode({
 
   const data = await ffmpegEncode(input, encodeArgs)
 
-  const metadata = await musicMetadata.parseBuffer(data)
+  if (checkEncodedMetadata) {
+    const metadata = await musicMetadata.parseBuffer(data)
 
-  assert.strictEqual(metadata.format.sampleRate, input.sampleRate)
-  assert.strictEqual(metadata.format.numberOfChannels, encodeArgs.channels || input.channels)
-  const checkDuration = input.data.length / input.channels / input.sampleRate
-  assert.ok(metadata.format.duration >= checkDuration - 0.05, metadata.format.duration + '')
-  assert.ok(metadata.format.duration <= checkDuration + 0.15, metadata.format.duration + '')
-  checkEncodedMetadata(metadata)
+    assert.strictEqual(metadata.format.sampleRate, input.sampleRate)
+    assert.strictEqual(metadata.format.numberOfChannels, encodeArgs.channels || input.channels)
+    const checkDuration = input.data.length / input.channels / input.sampleRate
+    assert.ok(metadata.format.duration >= checkDuration - 0.05, metadata.format.duration + '')
+    assert.ok(metadata.format.duration <= checkDuration + 0.15, metadata.format.duration + '')
+    checkEncodedMetadata(metadata)
+  }
 
   // await saveFile('mpeg.mp3', data)
 
