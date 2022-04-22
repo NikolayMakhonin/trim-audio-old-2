@@ -10,7 +10,11 @@ describe('io > audio > decode > mpeg123', function () {
 
   it('mp3-joint-stereo-vbr', async function () {
     const data = await getAssetData('mp3-joint-stereo-vbr.mp3')
-    const samples = await decodeMpeg123(data)
+    const samples = await decodeMpeg123({
+      data,
+      channels  : 2,
+      sampleRate: 16000,
+    })
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -21,7 +25,11 @@ describe('io > audio > decode > mpeg123', function () {
 
   it('mp3-stereo-vbr', async function () {
     const data = await getAssetData('mp3-stereo-vbr.mp3')
-    const samples = await decodeMpeg123(data)
+    const samples = await decodeMpeg123({
+      data,
+      channels  : 2,
+      sampleRate: 16000,
+    })
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -32,7 +40,11 @@ describe('io > audio > decode > mpeg123', function () {
 
   it('mp3-mono-vbr', async function () {
     const data = await getAssetData('mp3-mono-vbr.mp3')
-    const samples = await decodeMpeg123(data)
+    const samples = await decodeMpeg123({
+      data,
+      channels  : 1,
+      sampleRate: 16000,
+    })
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,
@@ -43,7 +55,11 @@ describe('io > audio > decode > mpeg123', function () {
 
   it('mp3-mono', async function () {
     const data = await getAssetData('mp3-mono.mp3')
-    const samples = await decodeMpeg123(data)
+    const samples = await decodeMpeg123({
+      data,
+      channels  : 1,
+      sampleRate: 16000,
+    })
     checkSamples({
       samples,
       checkAudioFunc       : testAudioFunc,

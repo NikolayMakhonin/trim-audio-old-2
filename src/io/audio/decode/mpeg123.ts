@@ -1,17 +1,22 @@
 import {getFFmpeg} from '../common/ffmpeg'
 import {AudioSamples} from '../contracts'
 
-export async function decodeMpeg123(mp3Data: Uint8Array): Promise<AudioSamples> {
-  const channels = 2
-  const sampleRate = 16000
-
+export async function decodeMpeg123({
+  data,
+  channels,
+  sampleRate,
+}: {
+  data: Uint8Array,
+  channels: number,
+  sampleRate: number,
+}): Promise<AudioSamples> {
   const ffmpeg = await getFFmpeg()
 
   // docs: https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md
   ffmpeg.FS(
     'writeFile',
     'input.mp3',
-    mp3Data,
+    data,
   )
 
   await ffmpeg.run(
@@ -20,7 +25,6 @@ export async function decodeMpeg123(mp3Data: Uint8Array): Promise<AudioSamples> 
     '-ac', channels + '',
     '-ar', sampleRate + '',
     '-acodec', 'pcm_f32le',
-    // '-codec:a', 'libmp3lame',
     'output.pcm',
   )
 

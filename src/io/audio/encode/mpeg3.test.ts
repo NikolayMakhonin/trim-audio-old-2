@@ -25,7 +25,11 @@ describe('io > audio > encode > mpeg3', function () {
 
     await saveFile('mpeg3.mp3', mp3Data)
 
-    const samples = await decodeMpeg123(mp3Data)
+    const samples = await decodeMpeg123({
+      data      : mp3Data,
+      channels  : 2,
+      sampleRate: 16000,
+    })
     // const samples = originalSamples
 
     checkSamples({
