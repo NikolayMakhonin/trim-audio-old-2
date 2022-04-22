@@ -1,4 +1,4 @@
-export type VorbisBitrate = 6 | 8 | 16 | 24 | 32 | 40 | 48 | 64 | 80 | 96 | 128 | 160 | 192 | 256
+export type VorbisBitrate = 24 | 32 | 40 | 48 | 64 | 80 | 96 | 128 | 160 | 192 | 256
 export type VorbisVbrQuality = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
 export type VorbisCutoff = 0 | 4000 | 6000 | 8000 | 12000 | 20000
 
@@ -16,7 +16,7 @@ export function ffmpegEncodeVorbisParams(options: {
   const vbr = options.vbr ?? true
   const vbrQuality = options.vbrQuality ?? 3
 
-  const result = []
+  const result = ['-c:a', 'libvorbis']
 
   if (vbr) {
     result.push('-q:a', vbrQuality + '')
@@ -25,11 +25,11 @@ export function ffmpegEncodeVorbisParams(options: {
   }
 
   if (options.minRate) {
-    result.push('-minrate', options.minRate + '')
+    result.push('-minrate', options.minRate + 'k')
   }
 
   if (options.maxRate) {
-    result.push('-maxrate', options.maxRate + '')
+    result.push('-maxrate', options.maxRate + 'k')
   }
 
   if (options.cutoff) {

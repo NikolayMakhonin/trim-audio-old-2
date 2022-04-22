@@ -5,6 +5,7 @@ import {testAudioFunc} from '../../test/generateTestSamples'
 import * as musicMetadata from 'music-metadata'
 import {IAudioMetadata} from 'music-metadata/lib/type'
 import {AudioSamples} from '../../contracts'
+import {saveFile} from '../../test/saveFile'
 
 export async function ffmpegTestEncode({
   inputType,
@@ -36,6 +37,10 @@ export async function ffmpegTestEncode({
 
   const data = await ffmpegEncode(input, encodeArgs)
 
+  assert.ok(data.length > 100, data.length + '')
+
+  await saveFile('mpeg.ogg', data)
+
   if (checkEncodedMetadata) {
     const metadata = await musicMetadata.parseBuffer(data, {
       mimeType: 'audio/ogg',
@@ -48,8 +53,6 @@ export async function ffmpegTestEncode({
     assert.ok(metadata.format.duration <= checkDuration + 0.15, metadata.format.duration + '')
     checkEncodedMetadata(metadata)
   }
-
-  // await saveFile('mpeg.mp3', data)
 
   return data
 }

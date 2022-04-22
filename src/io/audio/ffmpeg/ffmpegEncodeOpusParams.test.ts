@@ -18,7 +18,12 @@ describe('io > audio > ffmpeg > ffmpegEncodeOpusParams', function () {
             frameDuration: 20,
           }),
         },
-        checkEncodedMetadata: null,
+        checkEncodedMetadata(metadata) {
+          assert.strictEqual(metadata.format.container, 'Ogg')
+          assert.strictEqual(metadata.format.codec, 'Opus')
+          assert.ok(metadata.format.bitrate > 7000, metadata.format.bitrate + '')
+          assert.ok(metadata.format.bitrate <= 9500, metadata.format.bitrate + '')
+        },
       },
     })
   })

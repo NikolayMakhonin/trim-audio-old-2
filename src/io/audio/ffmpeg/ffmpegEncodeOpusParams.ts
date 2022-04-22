@@ -16,7 +16,8 @@ export function ffmpegEncodeOpusParams(options: {
   params?: string[],
 }): string[] {
   return [
-    '-b:a', options.bitrate + '',
+    '-c:a', 'libopus',
+    '-b:a', options.bitrate + 'k',
     '-vbr', options.vbr || 'on',
     '-compression_level', (options.compression || 10) + '',
     '-frame_duration', (options.frameDuration || 20) + '',
