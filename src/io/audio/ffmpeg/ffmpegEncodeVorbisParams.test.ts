@@ -24,4 +24,25 @@ describe('io > audio > ffmpeg > ffmpegEncodeVorbisParams', function () {
       },
     })
   })
+
+  it('vbr', async function () {
+    await ffmpegTestVariants({
+      encode: {
+        encodeArgs: {
+          outputFormat: 'ogg',
+          params      : ffmpegEncodeVorbisParams({
+            bitrate: 24,
+            vbr    : true,
+            cutoff : 0,
+          }),
+        },
+        checkEncodedMetadata(metadata) {
+          assert.strictEqual(metadata.format.container, 'Ogg')
+          assert.strictEqual(metadata.format.codec, 'Vorbis I')
+          assert.ok(metadata.format.bitrate > 60000, metadata.format.bitrate + '')
+          assert.ok(metadata.format.bitrate <= 70000, metadata.format.bitrate + '')
+        },
+      },
+    })
+  })
 })
